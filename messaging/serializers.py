@@ -8,8 +8,8 @@ from accounts.serializers import UserSerializer
 
 class MessageSerializer(serializers.ModelSerializer):
 
-    sender = UserSerializer()
-    recipient = UserSerializer()
+    # sender = UserSerializer()
+    # recipient = UserSerializer()
 
     class Meta:
         model = Message

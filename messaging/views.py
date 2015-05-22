@@ -16,8 +16,8 @@ from .serializers import MessageSerializer
 class MessageListAPI(MessageMixin, APIView):
     """ Create message object
     """
-    authentication_classes = (TokenAuthentication,)
-    permission_classes = (IsAuthenticated,)
+    # authentication_classes = (TokenAuthentication,)
+    # permission_classes = (IsAuthenticated,)
 
     def get(self, *args, **kwargs):
         # Serialize all message data
@@ -28,9 +28,8 @@ class MessageListAPI(MessageMixin, APIView):
         data = self.request.data
         serializer = MessageSerializer(data=self.request.data)
         if serializer.is_valid():
-            serializer.save()
-
             return Response(serializer.data, status=status.HTTP_201_CREATED)
+        
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -74,5 +73,3 @@ class MessageDetailAPI(MessageMixin, APIView):
         message.delete()
 
         return Response(status=status.HTTP_204_NO_CONTENT)
-
-
