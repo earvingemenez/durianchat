@@ -75,6 +75,71 @@ class MessageDetailAPI(MessageMixin, APIView):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
+
+###########################
+## Non-class based views ##
+###########################
+from rest_framework.decorators import (
+    api_view,
+    authentication_classes,
+    permission_classes,
+)
+from .models import Message
+
+
+@api_view(['GET', 'POST'])
+@authentication_classes((SessionAuthentication, BasicAuthentication))
+@permission_classes((IsAuthenticated,))
+def message_list(request):
+
+    if request.method == "GET":
+        # Get all messages
+        messages = Message.objects.all()
+        # serialize data
+        serializer = MessageSerializer(messages, many=True)
+
+        return Response(serializer.data)
+
+    elif request.method == "POST":
+        # serialize data
+        serializer = MessageSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['GET', 'PUT', 'DELETE'])
+@authentication_classes((SessionAuthentication, BasicAuthentication))
+@permission_classes((IsAuthenticated,))
+def message_detail(request, message_id):
+
+    # Get message object
+    try:
+        message = Message.objects.get(id=message_id)
+    except Message.DoesNotExist as e:
+        return Response(str(e), status=status.HTTP_404_NOT_FOUND)
+
+    if request.method == "GET":
+        serializer = MessageSerializer(message)
+
+        return Response(serializer.data)
+
+    elif request.method == "PUT":
+        serializer = MessageSerializer(message, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    elif request.method == "DELETE":
+        message.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+
 ##################################
 ## SAMPLE OF NON-ORM SERIALIZER ##
 ##################################
