@@ -5,13 +5,25 @@ from rest_framework.views import APIView
 from rest_framework.generics import ListAPIView
 from rest_framework.response import Response
 
+from rest_framework.authentication import TokenAuthentication
+from rest_framework.permissions import IsAuthenticated
+
+from .mixins import MessageMixin
 from .models import Message
 from .serializers import MessageSerializer
 
 
-class CreateMessageAPI(APIView):
+class MessageListAPI(MessageMixin, APIView):
     """ Create message object
     """
+    authentication_classes = (TokenAuthentication,)
+    permission_classes = (IsAuthenticated,)
+
+    def get(self, *args, **kwargs):
+        # Serialize all message data
+        serializer = MessageSerializer(self.queryset, many=True)
+        return Response(serializer.data)
+
     def post(self, *args, **kwargs):
         data = self.request.data
         serializer = MessageSerializer(data=self.request.data)
@@ -22,16 +34,11 @@ class CreateMessageAPI(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-class MessageDetailAPI(APIView):
+class MessageDetailAPI(MessageMixin, APIView):
     """ Retrieve, Update, or delete a message instance
     """
-    def get_object(self, message_id):
-        try:
-            return Message.objects.get(id=message_id)
-        except Message.DoesNotExist as e:
-            # log e
-            # Raise error
-            raise Http404
+    authentication_classes = (TokenAuthentication,)
+    permission_classes = (IsAuthenticated,)
 
     def get(self, *args, **kwargs):
         # Get message id
