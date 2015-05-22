@@ -10,14 +10,14 @@ from rest_framework.permissions import IsAuthenticated
 
 from .mixins import MessageMixin
 from .models import Message
-from .serializers import MessageSerializer
+from .serializers import MessageSerializer, MessageStaticSerializer
 
 
 class MessageListAPI(MessageMixin, APIView):
     """ Create message object
     """
-    # authentication_classes = (TokenAuthentication,)
-    # permission_classes = (IsAuthenticated,)
+    authentication_classes = (TokenAuthentication,)
+    permission_classes = (IsAuthenticated,)
 
     def get(self, *args, **kwargs):
         # Serialize all message data
@@ -73,3 +73,22 @@ class MessageDetailAPI(MessageMixin, APIView):
         message.delete()
 
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+##################################
+## SAMPLE OF NON-ORM SERIALIZER ##
+##################################
+
+class MessageStaticSerializer(APIView):
+    """ Serialize data without using a database model.
+    """
+    def get(self, *args, **kwargs):
+        # data from the client
+        data = self.request.data
+        serializer = MessageStaticSerializer(data)
+
+        # Static data
+        message = MessageClass(sender=1, recipient=2, context="Hey there!")
+        serializer = MessageStaticSerializer(message)
+
+        return Response(serializer.data)

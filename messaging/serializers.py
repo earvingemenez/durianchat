@@ -14,3 +14,13 @@ class MessageSerializer(serializers.ModelSerializer):
     class Meta:
         model = Message
         fields = ('id', 'sender', 'recipient', 'content')
+
+
+##################################
+## SAMPLE OF NON-ORM SERIALIZER ##
+##################################
+class MessageStaticSerializer(serializers.Serializer):
+
+    sender = serializers.IntegerField()
+    recipient = serializers.IntegerField()
+    content = serializers.CharField()
