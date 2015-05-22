@@ -68,3 +68,10 @@ if __name__ == "__main__":
         print "2 - View message"
         print "3 - User list"
         choice = ra_input("Pick an action: ")
+
+        if choice == "1":
+            print "create message"
+        if choice == "2":
+            print "view message"
+        if choice == "3":
+            print "user_list"
