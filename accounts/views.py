@@ -41,3 +41,16 @@ class UserListAPIView(UserMixin, APIView):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
 
         return Response(serializer.errors)
+
+
+class UserDetailAPIView(UserMixin, APIView):
+
+    authentication_classes = (TokenAuthentication,)
+    permission_classes = (IsAuthenticated,)
+
+    def get(self, *args, **kwargs):
+        user = self.get_object(kwargs.get('user_id'))
+        # serialize user object
+        serializer = UserSerializer(user)
+
+        return Response(serializer.data)

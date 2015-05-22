@@ -28,6 +28,7 @@ class MessageListAPI(MessageMixin, APIView):
         data = self.request.data
         serializer = MessageSerializer(data=self.request.data)
         if serializer.is_valid():
+            serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -88,7 +89,7 @@ from .models import Message
 
 
 @api_view(['GET', 'POST'])
-@authentication_classes((SessionAuthentication, BasicAuthentication))
+@authentication_classes((TokenAuthentication,))
 @permission_classes((IsAuthenticated,))
 def message_list(request):
 
@@ -111,7 +112,7 @@ def message_list(request):
 
 
 @api_view(['GET', 'PUT', 'DELETE'])
-@authentication_classes((SessionAuthentication, BasicAuthentication))
+@authentication_classes((TokenAuthentication,))
 @permission_classes((IsAuthenticated,))
 def message_detail(request, message_id):
 
