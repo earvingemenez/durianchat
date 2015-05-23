@@ -25,17 +25,30 @@ class User(BaseTool):
         return super(User, self).__init__(*args, **kwargs)
 
     def create_user(self):
-        # ask for username
-        username = raw_input("Username: ")
-        # ask for password
-        password = raw_input("Password: ")
+        try:
+            # ask for username
+            username = raw_input("Username: ")
+            # ask for password
+            password = raw_input("Password: ")
 
-        url = "%s%s" % (API_DOMAIN, self.USER_API_URL)
-        data = urllib.urlencode({'username': username, 'password': password})
+            url = "%s%s" % (API_DOMAIN, self.USER_API_URL)
+            data = urllib.urlencode({'username': username, 'password': password})
 
-        response = urllib2.urlopen(url=url, data=data)
+            response = self.to_JSON(urllib2.urlopen(url=url, data=data).read())
 
-        return response.read()
+            if response.get('id'):
+                print "The account has been successfully created!.\n"
+                return True
+            else:
+                print "\n"
+                print response
+                print "\n"
+                return False
+
+        except Exception as e:
+            print e
+            print "There was an error when creating an account. please try again.\n"
+            return False
 
     def login_user(self):
         try:
@@ -146,14 +159,36 @@ class Main(User, Message):
         return super(Main, self).__init__(*args, **kwargs)
 
     def run(self, *args, **kwargs):
-        # User login
-        self.login()
+        while True:
+            print "1 - Login | 2 - Create new account | 3 - Quit\n\n"
+            choice = raw_input("Pick an action: ")
+
+            if choice == "1":
+                # User login
+                self.login()
+                break;
+
+            elif choice == "2":
+                # create user
+                is_created = self.create_user()
+                if not is_created:
+                    continue;
+                else:
+                    print "\nYou can now login using the account that you have created.\n"
+                    self.login()
+                    break;
+
+            elif choice == "3":
+                sys.exit("Thank you for using durianchat! bye. \n\n")
+
+
 
         # MAIN MENU
         self.main_menu()
 
     def login(self):
         while True:
+            print "\nUSER LOGIN:"
             # login user
             token = self.login_user()
 
@@ -186,7 +221,7 @@ class Main(User, Message):
 
             elif choice == "3":
                 os.system('clear')
-                sys.exit("Thank you for wasting your time! byes.\n\n")
+                sys.exit("Thank you for wasting your time! bye.\n\n")
             else:
                 os.system('clear')
                 print "Invalid choice. Please try again.\n"
